@@ -35,12 +35,6 @@ const ResultsPopup = ({ onClose, results, onSendToAll }) => (
 
       {/* Footer */}
       <div className="p-6 border-t border-gray-100">
-        <button
-          onClick={onSendToAll}
-          className="w-full bg-[#0075ff] text-white rounded-lg py-3 hover:bg-[#0075ff]/90 transition-colors"
-        >
-          Send to all
-        </button>
       </div>
     </div>
   </div>
@@ -53,29 +47,27 @@ const App = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [glad, setGlad] = useState("");
+  const [modelArray, setModelArray] = useState([])
   
   // Sample results - replace with actual API response
   const results = [
     {
-      name: 'OpenAI GPT-3',
+      name: 'GLAD',
+      text: glad
+    },
+    {
+      name: 'ParaGeDi',
       text: 'The future of the economy is uncertain, but it\'s clear that we need to adapt to a new type of business model.\nThe future of the economy is uncertain, but it\'s clear that we need to adapt to a new type of business model.'
     },
     {
-      name: 'EleutherAI GPT-4',
+      name: 'CondBERT',
       text: 'The future of the economy is uncertain, but it\'s clear that we need to adapt to a new type of business model.\nThe future of the economy is uncertain, but it\'s clear that we need to adapt to a new type of business model.'
     },
     {
-      name: 'ChatGPT',
+      name: 'ruT5',
       text: 'The future of the economy is uncertain, but it\'s clear that we need to adapt to a new type of business model.\nThe future of the economy is uncertain, but it\'s clear that we need to adapt to a new type of business model.'
-    },
-    {
-      name: 'COG-GPT',
-      text: 'The future of the economy is uncertain, but it\'s clear that we need to adapt to a new type of business model.\nThe future of the economy is uncertain, but it\'s clear that we need to adapt to a new type of business model.'
-    },
-    {
-      name: 'GPT-3',
-      text: 'The future of the economy is uncertain, but it\'s clear that we need to adapt to a new type of business model.\nThe future of the economy is uncertain, but it\'s clear that we need to adapt to a new type of business model.'
-    }
+    } 
   ];
 
   const handleRewrite = async () => {
@@ -89,7 +81,27 @@ const App = () => {
 
     try {
       // Simulated API call - replace with actual implementation
-      await new Promise(resolve => setTimeout(resolve, 1000));
+        fetch('http://127.0.0.1:5000/api/process', {
+             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ input_text: inputText }),
+            })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Output from server:', JSON.parse(data.output_text)); 
+            console.log(JSON.parse(data.output_text)["nonToxic"])
+            setGlad(JSON.parse(data.output_text)["nonToxic"])
+             let glabObj = {
+                name: 'GLAD',
+                text: glad
+            }
+            setModelArray([glabObj])
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
       setShowResults(true);
       setIsLoading(false);
     } catch (err) {
@@ -184,7 +196,7 @@ const App = () => {
       {/* Results Popup */}
       {showResults && (
         <ResultsPopup
-          results={results}
+          results={modelArray}
           onClose={() => setShowResults(false)}
           onSendToAll={handleSendToAll}
         />
