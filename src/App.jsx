@@ -1,5 +1,5 @@
 // App.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const ModelResult = ({ name, text }) => (
   <div className="mb-6 last:mb-0">
@@ -50,6 +50,16 @@ const App = () => {
   const [glad, setGlad] = useState("");
   const [modelArray, setModelArray] = useState([])
   
+    useEffect(()=>{
+        if(glad != ""){
+         let glabObj = {
+                name: 'GLAD',
+                text: glad
+            }
+            setModelArray([glabObj])
+            setShowResults(true)
+        }
+    }, [glad])
   // Sample results - replace with actual API response
   const results = [
     {
@@ -93,16 +103,11 @@ const App = () => {
             console.log('Output from server:', JSON.parse(data.output_text)); 
             console.log(JSON.parse(data.output_text)["nonToxic"])
             setGlad(JSON.parse(data.output_text)["nonToxic"])
-             let glabObj = {
-                name: 'GLAD',
-                text: glad
-            }
-            setModelArray([glabObj])
+            
         })
         .catch((error) => {
             console.error('Error:', error);
         });
-      setShowResults(true);
       setIsLoading(false);
     } catch (err) {
       setError('Request Failed: error');
